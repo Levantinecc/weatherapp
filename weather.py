@@ -8,4 +8,10 @@ y = "-97.0892"
 request = requests.get('https://api.weather.gov/points/' + str(x) + ',' + str(y))
 forecast_url = request.json()['properties']['forecast']
 request = requests.get(forecast_url)
-print(request.json())
+for days in request.json()['properties']['periods']:
+    if days['isDaytime'] != True:
+        continue
+    print(" ====== For " + days['name'] + " " + days['startTime'] + " ======")
+    print("The Current temperature is: " + str(days['temperature']) + "F")
+    print(days['detailedForecast'])
+    print("        ")
