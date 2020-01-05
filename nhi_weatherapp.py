@@ -1,19 +1,27 @@
 import requests
-import json
+import mysql.connector
 
-x = 39.7456
-y = -97.0892
-#x = input("Enter first coordinate : ")
-#y = input("Enter second coordinate : ")
+cityName = "San Jose"
+State = "CA"
 
-response = requests.get("https://api.weather.gov/points/" + str(x) + ',' + str(y))
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  database="weather"
+)
+mycursor = mydb.cursor()
+mycursor.execute('SELECT lat, lng FROM weather.uscities where city = "' +cityName +'" AND state_id = "' + State+'";')
+myresult = mycursor.fetchall()
+
+for x in myresult:
+  longitude=(x[0])
+  latitude=(x[1])
+
+response = requests.get("https://api.weather.gov/points/" + str(longitude) + ',' + str(latitude))
 print(response.json())
 forecast_url = response.json()['properties']['forecast']
-#print(forecast_url)
 requests = requests.get(forecast_url)
-#print(requests.json())
 detail_forecast = requests.json()['properties']['periods']
-#print(detail_forecast)
 
 for n in detail_forecast:
     if n['isDaytime'] == True:
@@ -21,9 +29,3 @@ for n in detail_forecast:
         print("Temperature is: ", n['temperature'])
         print("Predicted forecast: ", n['detailedForecast'])
         print("")
-
-#temperature = requests.json()['properties']['periods']['temperature']
-
-#detailedForecast = requests.json()['properties']['periods']['detailedForecast']
-
-
